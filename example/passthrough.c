@@ -289,11 +289,18 @@ static int xmp_create(const char *path, mode_t mode,
 	return 0;
 }
 
+static int write_block_flag = 0;
 static int xmp_open(const char *path, struct fuse_file_info *fi)
 {
 	int res;
 
 	syslog(LOG_ERR, "zhjwang...xmp_open...path:%s\n", path);
+	int res_open_cm = strcmp(path, "/home/zhjwang/test/1.wps");
+	if (res_open_cm == 0 && write_block_flag == 1)
+	{
+		syslog(LOG_ERR, "zhjwang...xmp_open...return -1\n");
+		return -1;
+	}
 	res = open(path, fi->flags);
 	if (res == -1)
 		return -errno;
@@ -337,6 +344,11 @@ static int xmp_write(const char *path, const char *buf, size_t size,
 	syslog(LOG_ERR, "zhjwang...xmp_write...path:%s\n", path);
 	syslog(LOG_ERR, "zhjwang...xmp_write...size:%ld\n", size);
 	syslog(LOG_ERR, "=============================");
+	int res_write_cm = strcmp(path, "/home/zhjwang/test/1.wps");
+	if (res_write_cm == 0 && write_block_flag == 0)
+	{
+		write_block_flag = 1;
+	}
 
 	(void) fi;
 	if(fi == NULL)
