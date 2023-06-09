@@ -317,6 +317,18 @@ static int xmp_open(const char *path, struct fuse_file_info *fi)
 	return 0;
 }
 
+ void get_process_name_by_pid(const int pid)
+ {
+	char name[1024] = { 0 };
+	sprintf(name, "/proc/%d/cmdline",pid);
+	FILE* f = fopen(name,"r");
+    if(f){
+		size_t size =  fread(name, sizeof(char), 1024, f);
+		syslog(LOG_ERR, "zhjwang...get_process_name_by_pid: [%s],[%ld]\n", name,size);
+		fclose(f);
+	}
+ }
+
 static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
 		    struct fuse_file_info *fi)
 {
@@ -324,6 +336,13 @@ static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
 	int res;
 
 	syslog(LOG_ERR, "zhjwang...xmp_read...path:%s\n", path);
+	
+	//get context
+	struct fuse_context *context = fuse_get_context();
+	pid_t pid = context->pid;
+	syslog(LOG_ERR, "zhjwang...xmp_read...pid: [%d]\n", pid);
+	get_process_name_by_pid(pid);
+
 	if(fi == NULL)
 		fd = open(path, O_RDONLY);
 	else
