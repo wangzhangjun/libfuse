@@ -36,6 +36,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <syslog.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <dirent.h>
@@ -292,6 +293,7 @@ static int xmp_open(const char *path, struct fuse_file_info *fi)
 {
 	int res;
 
+	syslog(LOG_ERR, "zhjwang...xmp_open...path:%s\n", path);
 	res = open(path, fi->flags);
 	if (res == -1)
 		return -errno;
@@ -306,6 +308,7 @@ static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
 	int fd;
 	int res;
 
+	syslog(LOG_ERR, "zhjwang...xmp_read...path:%s\n", path);
 	if(fi == NULL)
 		fd = open(path, O_RDONLY);
 	else
@@ -323,11 +326,17 @@ static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
 	return res;
 }
 
+// journalctl -f | grep passthrough
 static int xmp_write(const char *path, const char *buf, size_t size,
 		     off_t offset, struct fuse_file_info *fi)
 {
 	int fd;
 	int res;
+
+	syslog(LOG_ERR, "=============================");
+	syslog(LOG_ERR, "zhjwang...xmp_write...path:%s\n", path);
+	syslog(LOG_ERR, "zhjwang...xmp_write...size:%ld\n", size);
+	syslog(LOG_ERR, "=============================");
 
 	(void) fi;
 	if(fi == NULL)
